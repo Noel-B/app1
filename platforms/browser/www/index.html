@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ember.js/2.18.2/ember.min.js"></script>
+    <title>myReviewr</title>
+</head>
+
+<body>
+    <div class="update">
+        <h1>Update Remote Database</h1>
+        <label for="val1">Val1</label><input type="text" id="val1"><br>
+		<label for="val2">Val2</label><input type="text" id="val2"><br>
+		<label for="val3">Val3</label><input type="text" id="val3"><br><br>
+		<button id="clickme">Update Remote Database</button><br><br>
+		<button id="showdata">Show Data from Server</button>
+    </div>
+	<br>
+	<h1>Display Server Data</h1>
+	<div id="content">
+		<table id="display-data">
+  <thead>
+    <tr></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+	</div>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+		$('#clickme').on('click',function(){
+			$('#sample-div').toggleClass('changeme');
+			var val1 = $('#val1').val();
+			var val2 = $('#val2').val();
+			var val3 = $('#val3').val();
+			$.ajax({
+				type: "POST",
+				url:"https://myreviewr.com/php/insert.php",
+				 data: "title="+val1+"&duration="+val2+"&price="+val3+"&insert=",
+				 crossDomain: true,
+				 cache: false,
+				 beforeSend: function(){ $("#insert").val('Connecting...');},
+				 success: function(data){
+				 alert(data);
+				 }
+				 });
+			
+			
+		});
+		
+		$('#showdata').on('click',function(){
+		
+		var url="https://myreviewr.com/php/json.php";
+		$.getJSON(url,function(data){
+			
+			
+			var colHeader = Object.keys(data[0]);
+
+			for(var i=0; i<colHeader.length; i++) {
+			  $('table thead tr').append('<th>' + colHeader[i] + '</th>');
+			}
+
+			for(var i=0; i<data.length; i++){
+			  $('table tbody').append('<tr></tr>')
+			  for(var j= 0; j<colHeader.length; j++){
+				$('table tbody tr').last().append('<td>' + data[i][colHeader[j]] + '</td>');
+			  }
+			}
+			
+			
+			
+		});
+	});	
+
+	
+	</script>
+	
+	<style>
+		#sample-div {
+			transition: all 0.2s ease-in;
+			height:100px;
+			width:100px;
+			margin:-100px;
+			background:violet;
+		}
+		.changeme {
+			height:200px !important;
+			width:200px !important;
+			margin:0px !important;
+		}
+		#display-data table td {
+			border: 1px solid blue;
+		}
+	</style>
+	
+</body>
+
+</html>
