@@ -38,7 +38,7 @@
     -->
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/ember.js/2.18.2/ember.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lovefield/2.1.12/lovefield.min.js"></script>
     <title>myReviewr</title>
 </head>
 
@@ -61,11 +61,17 @@
   <tbody></tbody>
 </table>
 	</div>
-    <script type="text/javascript" src="cordova.js"></script>
-    <script type="text/javascript" src="js/index.js"></script>
+	<br>
+	<button id="fromOffline">Submit from Offline</button>
+<!--    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script> -->
     <script type="text/javascript">
-        app.initialize();
-		$('#clickme').on('click',function(){
+   
+ 
+   //RETURN THIS!!     app.initialize();
+
+
+$('#clickme').on('click',function(){
 			$('#sample-div').toggleClass('changeme');
 			var val1 = $('#val1').val();
 			var val2 = $('#val2').val();
@@ -102,12 +108,43 @@
 			  for(var j= 0; j<colHeader.length; j++){
 				$('table tbody tr').last().append('<td>' + data[i][colHeader[j]] + '</td>');
 			  }
-			}
-			
-			
-			
+			}		
 		});
-	});	
+	});
+		/* LOVEFIELD */
+		var schemaBuilder = lf.schema.create('mytestdb2', 1);
+
+schemaBuilder.createTable('test_table').
+    addColumn('id', lf.Type.INTEGER).
+    addColumn('description', lf.Type.STRING).
+    addColumn('deadline', lf.Type.STRING).
+    addColumn('done', lf.Type.STRING).
+    addPrimaryKey(['id']);
+    //addIndex('idxDeadline', ['deadline'], false, lf.Order.DESC);
+
+var test_db;
+var test;
+schemaBuilder.connect().then(function(db) {
+	test_db = db;
+  test = db.getSchema().table('test_table');
+  var row = test.createRow({
+    'id': 1,
+    'description': 'Get a cup of coffee',
+    'deadline': 'watev',
+    'done': 'afawdad'
+  });
+
+  return db.insertOrReplace().into(test).values([row]).exec();
+}).then(function() {
+  return test_db.select().from(test).exec();
+}).then(function(results) {
+  
+	console.log(results);
+	
+	/* results.forEach(function(row) {
+    console.log(row['description'], 'before', row['deadline']);
+  });*/
+});
 
 	
 	</script>
